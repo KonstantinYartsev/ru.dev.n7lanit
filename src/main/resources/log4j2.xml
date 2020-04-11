@@ -10,19 +10,6 @@
             <!-- Задание шаблона вывода собщения на экран-->
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{10} - %msg%n"/>
         </Console>
-        <!-- Аппендер для вывода в файл-->
-        <RollingFile name="CalcLogFile"
-                     fileName="logs/calc.log"
-                     filePattern="logs/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.log.gz">
-            <PatternLayout>
-                <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
-            </PatternLayout>
-            <Policies>
-                <TimeBasedTriggeringPolicy interval = "1" />
-                <SizeBasedTriggeringPolicy size="100 MB" />
-            </Policies>
-        </RollingFile>
-
         <RollingFile name="TestLogFile"
                      fileName="logs/test.log"
                      filePattern="logs/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.log.gz">
@@ -42,6 +29,7 @@
     <Loggers>
         <!-- Root - безымянный стандартный логгер, который будет получать все сообщения от приложение -->
         <Root level="TRACE"> <!-- задание уровня детализации вывода -->
+            <AppenderRef ref="TestLogFile"/>
             <AppenderRef ref="Console"/>  <!-- Ссылка на Аппендер, в который будуи выводиться сообщения Логгера-->
         </Root>
     </Loggers>

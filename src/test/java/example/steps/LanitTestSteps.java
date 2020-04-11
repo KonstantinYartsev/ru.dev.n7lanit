@@ -1,33 +1,35 @@
 package example.steps;
 
-import com.codeborne.selenide.Selenide;
-import com.codeborne.selenide.logevents.SelenideLogger;
-import example.LanitTest;
-import io.qameta.allure.Attachment;
 import example.pages.*;
-import io.cucumber.core.api.Scenario;
 import io.cucumber.java.After;
 import io.cucumber.java.AfterStep;
 import io.cucumber.java.Before;
+import io.cucumber.java.Scenario;
 import io.cucumber.java.ru.*;
-import io.qameta.allure.selenide.AllureSelenide;
+import io.qameta.allure.Attachment;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.util.FileUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
-import webDriver.WebDriverManager;
+import ru.yandex.qatools.ashot.AShot;
+import ru.yandex.qatools.ashot.Screenshot;
+import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
+import webDriver.WebDriverManager;;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 
 import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 
 
 public class LanitTestSteps  {
-    private final Logger log = LogManager.getRootLogger();
-    private WebDriver webDriver;
-    private WebDriverWait waiter;
+
+    private static WebDriverWait waiter;
     MainPage mainPage = new MainPage();
     MenuBar menuBar = new MenuBar();
     CategoriesPage categoriesPage = new CategoriesPage();
@@ -35,26 +37,9 @@ public class LanitTestSteps  {
     UserPage userPage = new UserPage();
 
 
-    @Before
-    public void beforeTests(Scenario scenario){
-
-        log.info("Запуск теста "+ scenario.getName());
-        webDriver = WebDriverManager.getDriver();
-        waiter = new WebDriverWait(webDriver, 5);
-    }
-
-
-    @After
-    public void afterTests(Scenario scenario){
-        log.info("Тест заветшен "+ scenario.getName());
-        WebDriverManager.quit();
-        waiter = null;
-    }
-
     @Пусть("открыт браузер и введен адрес \"(.*)\"$")
     public void browserIsOpenAndAddressIsEntered(String url) {
         mainPage.openPage(url);
-        SelenideLogger.addListener("AllureSelenide", new AllureSelenide().screenshots(true).savePageSource(false));
     }
 
 
@@ -70,7 +55,7 @@ public class LanitTestSteps  {
     @Когда("откроется страница с {string}")
     public void categoriesPageIsOpened(String name) {
         try {
-            waiter.until(visibilityOfAllElements(categoriesPage.get(name)));
+            waiter.until(visibilityOf(categoriesPage.get(name)));
         }catch (TimeoutException e){
             Assert.fail("Элемент " + name + " не отобразился" + e.getMessage());
         }
@@ -79,7 +64,7 @@ public class LanitTestSteps  {
     @Когда("будет открыта страница с {string}")
     public void usersPageIsOpened(String name) {
         try {
-            waiter.until(visibilityOfAllElements(usersPage.get(name)));
+            waiter.until(visibilityOf(usersPage.get(name)));
         }catch (TimeoutException e){
             Assert.fail("Элемент " + name + " не отобразился" + e.getMessage());
         }
@@ -100,18 +85,23 @@ public class LanitTestSteps  {
     @Тогда("откроется страница пользователя с заголовком {string}")
     public void userPageOpens(String name) {
         try {
-            waiter.until(visibilityOfAllElements(userPage.get(name)));
+            waiter.until(visibilityOf(userPage.get(name)));
         }catch (TimeoutException e){
             Assert.fail("Элемент " + name + " не отобразился" + e.getMessage());
         }
     }
 
-    @Когда("будетут доступно {string}")
+    @Когда("будет доступно {string}")
     public void fieldIsVisibility(String name) {
         try {
-            waiter.until(visibilityOfAllElements(menuBar.get(name)));
+            waiter.until(visibilityOf(menuBar.get(name)));
         }catch (TimeoutException e){
             Assert.fail("Элемент " + name + " не отобразился" + e.getMessage());
         }
+    }
+
+    public static void startWaiter(){waiter = new WebDriverWait(WebDriverManager.getDriver(), 5);}
+    public static void stopWaiter(){
+        waiter = null;
     }
 }
